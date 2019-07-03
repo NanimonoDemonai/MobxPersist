@@ -20,6 +20,7 @@ export class TodoStore {
     this.todo = todo;
     this._date = new Date().toString();
     this.id = uuid.v4();
+
     console.log(JSON.stringify(this));
     autorun(() => console.log(`todo:SetTo:${this.todo}`));
   }

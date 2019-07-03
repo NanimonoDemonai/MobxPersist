@@ -9,6 +9,7 @@
     "typescript": "^3.5.2"
   },
   "dependencies": {
+    "localforage": "^1.7.3",
     "mobx": "^5.10.1",
     "mobx-persist": "^0.4.1",
     "mobx-react-lite": "^1.4.1",

@@ -1,6 +1,6 @@
 import { FC, useContext, useState } from "react";
 import { TodoListContext } from "../context";
-import { TodoStore } from "../store/TodoList";
+import { TodoStore } from "../store/Todo";
 
 export const TodoListAdder: FC = () => {
   const todoList = useContext(TodoListContext);

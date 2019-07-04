@@ -13,12 +13,16 @@ configure({ enforceActions: "observed" });
 export class TodoListStore {
   @persist(`list`, TodoStore)
   @observable
-  _todoList: IObservableArray<TodoStore>;
-  @observable saveName: string | null = null;
+  private readonly _todoList: IObservableArray<TodoStore>;
 
   constructor(todoList: TodoStore[] = []) {
     this._todoList = todoList as IObservableArray<TodoStore>;
     this.addTodo(new TodoStore("初めてのTODO"));
+  }
+
+  @computed
+  get todoList(): ReadonlyArray<TodoStore> {
+    return this._todoList;
   }
 
   @action.bound
@@ -29,10 +33,5 @@ export class TodoListStore {
   @action.bound
   removeTodo(children: TodoStore) {
     this._todoList.remove(children);
-  }
-
-  @computed
-  get todoList(): ReadonlyArray<TodoStore> {
-    return this._todoList;
   }
 }

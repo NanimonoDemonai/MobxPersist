@@ -1,18 +1,20 @@
 import { TodoListHydrator } from "../store/TodoListHydrator";
 import { useEffect } from "react";
 import { Observer } from "mobx-react-lite";
-import { TodoListView } from "../components/TodoListView";
 import { TodoListAdder } from "../components/TodoListAdder";
 import { TodoListContext } from "../context";
 import { TodoListShifter } from "../components/TodoListShifter";
+import { TodoList } from "../components/TodoList";
 
 const store = new TodoListHydrator();
+
 export default () => {
   useEffect(() => {
     store.hydrate("Todo");
   }, []);
   return (
     <>
+      <h1>TODOリスト</h1>
       <Observer>
         {() => (
           <TodoListContext.Provider value={store.todoList}>
@@ -20,8 +22,10 @@ export default () => {
               {store.saveName}:{store.status}
             </p>
             <TodoListShifter hydrator={store} />
+
             <hr />
-            <TodoListView />
+
+            <TodoList />
             <TodoListAdder />
           </TodoListContext.Provider>
         )}

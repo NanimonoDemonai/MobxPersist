@@ -3,7 +3,7 @@ import { TodoListContext } from "../context";
 import { Observer } from "mobx-react-lite";
 import { Todo } from "./Todo";
 
-export const TodoListView: FC = () => {
+export const TodoList: FC = () => {
   const todoList = useContext(TodoListContext);
   return (
     <>
@@ -11,7 +11,7 @@ export const TodoListView: FC = () => {
         <Observer>
           {() => (
             <>
-              {todoList.todolist.map(e => (
+              {todoList.todoList.map(e => (
                 <Todo key={e.id} todo={e} />
               ))}
             </>

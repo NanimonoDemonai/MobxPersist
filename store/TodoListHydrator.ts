@@ -1,4 +1,4 @@
-import { configure, flow, observable } from "mobx";
+import { computed, configure, flow, observable } from "mobx";
 import * as Persist from "mobx-persist";
 import { TodoListStore } from "./TodoList";
 import localForage from "localforage";
@@ -12,34 +12,55 @@ export enum TodoListHydratorStatus {
 }
 
 export class TodoListHydrator {
-  @observable todoList: TodoListStore | null = null;
-  @observable saveName: string | null = null;
-  @observable status: TodoListHydratorStatus = TodoListHydratorStatus.init;
+  @observable private _todoList: TodoListStore | null = null;
+  @observable private _saveName: string | null = null;
+  @observable private _status: TodoListHydratorStatus =
+    TodoListHydratorStatus.init;
+  private _hydrator: ReturnType<typeof Persist.create> | null = null;
 
-  hydrate = flow(this.hydrateGen);
+  @computed
+  get todoList(): TodoListStore | null {
+    return this._todoList;
+  }
 
-  private *hydrateGen(saveName: string) {
-    this.saveName = saveName;
-    this.todoList = null;
-    this.status = TodoListHydratorStatus.loading;
+  @computed
+  get saveName(): string | null {
+    return this._saveName;
+  }
+
+  @computed
+  get status(): TodoListHydratorStatus {
+    return this._status;
+  }
+
+  private get hydrator(): ReturnType<typeof Persist.create> {
+    if (this._hydrator == null) {
+      localForage.config({
+        driver: localForage.LOCALSTORAGE,
+        name: "TodoApp"
+      });
+
+      this._hydrator = Persist.create({
+        storage: localForage
+      });
+
+      return this._hydrator;
+    }
+    return this._hydrator;
+  }
+
+  readonly hydrate = flow(this.hydrateGenerator);
+
+  private *hydrateGenerator(saveName: string) {
+    this._saveName = saveName;
+    this._todoList = null;
+    this._status = TodoListHydratorStatus.loading;
 
     const newTodoList = new TodoListStore();
 
-    localForage.config({
-      driver: localForage.LOCALSTORAGE,
-      name: "TodoApp",
-      version: 1.0,
-      storeName: "keyvaluepairs",
-      description: "TODOアプリのデータ"
-    });
+    yield this.hydrator<TodoListStore>(saveName, newTodoList);
 
-    const hydrate = Persist.create({
-      storage: localForage
-    });
-
-    yield hydrate<TodoListStore>(saveName, newTodoList);
-
-    this.todoList = newTodoList;
-    this.status = TodoListHydratorStatus.loaded;
+    this._todoList = newTodoList;
+    this._status = TodoListHydratorStatus.loaded;
   }
 }
